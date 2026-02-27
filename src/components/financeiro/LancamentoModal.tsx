@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Plus, X } from 'lucide-react';
-import { Student, TransactionType } from './types';
+import { Student, TransactionType } from '@/types/types';
 
 const DEFAULT_FORM = {
   type: 'receber' as TransactionType,

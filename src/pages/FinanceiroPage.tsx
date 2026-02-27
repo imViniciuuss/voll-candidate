@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
-import LancamentoModal, { LancamentoForm } from './financeiro/LancamentoModal';
-import TransactionRow from './financeiro/TransactionRow';
-import { Transaction, Student, TransactionType, TransactionStatus } from './financeiro/types';
+import LancamentoModal, { LancamentoForm } from '../components/financeiro/LancamentoModal';
+import TransactionRow from '../components/financeiro/TransactionRow';
+import { Transaction, Student, TransactionType, TransactionStatus } from "@/types/types"
 
 const formatCurrency = (value: number) =>
   value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });

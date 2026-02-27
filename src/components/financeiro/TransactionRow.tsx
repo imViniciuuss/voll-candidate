@@ -1,5 +1,5 @@
 import { Check, X, Trash2 } from 'lucide-react';
-import { Transaction, TransactionStatus } from './types';
+import { Transaction, TransactionStatus } from '@/types/types';
 
 const STATUS_STYLES: Record<TransactionStatus, string> = {
   pendente: 'bg-amber-100 text-amber-700',
