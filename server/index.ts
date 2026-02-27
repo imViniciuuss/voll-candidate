@@ -1,21 +1,10 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
-import studentsRouter     from "./routes/students.js";
-import schedulesRouter    from "./routes/schedules.js";
-import transactionsRouter from "./routes/transactions.js";
-import chatRouter         from "./routes/chat.js";
+import app from "./app.js";
 
 async function startServer(): Promise<void> {
-  const app = express();
   const PORT = 3000;
-
-  app.use(express.json());
-
-  app.use("/api/students",     studentsRouter);
-  app.use("/api/schedules",    schedulesRouter);
-  app.use("/api/transactions", transactionsRouter);
-  app.use("/api/ai",           chatRouter);
 
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
