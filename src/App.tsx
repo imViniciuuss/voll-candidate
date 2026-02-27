@@ -23,6 +23,12 @@ import {
   X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import AgendaPage from './pages/AgendaPage';
+import ExportMenu from './components/ExportMenu';
+import FinanceiroPage from './pages/FinanceiroPage';
+import ChatWidget from './components/ChatWidget';
+
+type Page = 'dashboard' | 'agenda' | 'financeiro';
 
 interface Student {
   id: number;
@@ -35,6 +41,7 @@ interface Student {
 }
 
 export default function App() {
+  const [page, setPage] = useState<Page>('dashboard');
   const [students, setStudents] = useState<Student[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -54,9 +61,10 @@ export default function App() {
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch('/api/students');
-      const data = await response.json();
-      setStudents(data);
+      const res = await fetch('/api/students');
+      if (!res.ok) throw new Error('Erro ao carregar alunos');
+      const data = await res.json();
+      setStudents(data ?? []);
     } catch (error) {
       console.error('Error fetching students:', error);
     } finally {
@@ -67,16 +75,18 @@ export default function App() {
   const handleAddStudent = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/students', {
+      const res = await fetch('/api/students', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newStudent)
+        body: JSON.stringify(newStudent),
       });
-      if (response.ok) {
-        fetchStudents();
-        setIsModalOpen(false);
-        setNewStudent({ name: '', email: '', phone: '', plan: 'Mensal', status: 'Ativo' });
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        throw new Error(errorBody.error || 'Erro ao criar aluno');
       }
+      fetchStudents();
+      setIsModalOpen(false);
+      setNewStudent({ name: '', email: '', phone: '', plan: 'Mensal', status: 'Ativo' });
     } catch (error) {
       console.error('Error adding student:', error);
     }
@@ -104,10 +114,10 @@ export default function App() {
           </div>
           
           <nav className="space-y-1">
-            <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" active />
-            <NavItem icon={<Users size={20} />} label="Alunos" />
-            <NavItem icon={<Calendar size={20} />} label="Agenda" disabled />
-            <NavItem icon={<TrendingUp size={20} />} label="Financeiro" disabled />
+            <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" active={page === 'dashboard'} onClick={() => setPage('dashboard')} />
+            <NavItem icon={<Users size={20} />} label="Alunos" active={false} onClick={() => setPage('dashboard')} />
+            <NavItem icon={<Calendar size={20} />} label="Agenda" active={page === 'agenda'} onClick={() => setPage('agenda')} />
+            <NavItem icon={<TrendingUp size={20} />} label="Financeiro" active={page === 'financeiro'} onClick={() => setPage('financeiro')} />
           </nav>
         </div>
         
@@ -118,8 +128,11 @@ export default function App() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col">
-        {/* Header */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Header – only on dashboard */}
+        {page === 'agenda'      && <AgendaPage />}
+        {page === 'financeiro'  && <FinanceiroPage />}
+        {page === 'dashboard'   && <>
         <header className="h-16 bg-white border-bottom border-slate-200 flex items-center justify-between px-8">
           <div className="relative w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -132,13 +145,16 @@ export default function App() {
             />
           </div>
           
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm"
-          >
-            <UserPlus size={18} />
-            Novo Aluno
-          </button>
+          <div className="flex items-center gap-2">
+            <ExportMenu />
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm"
+            >
+              <UserPlus size={18} />
+              Novo Aluno
+            </button>
+          </div>
         </header>
 
         {/* Dashboard Content */}
@@ -244,7 +260,10 @@ export default function App() {
             </div>
           </div>
         </div>
+        </>}
       </main>
+
+      <ChatWidget />
 
       {/* Add Student Modal */}
       <AnimatePresence>
@@ -357,13 +376,16 @@ export default function App() {
   );
 }
 
-function NavItem({ icon, label, active = false, disabled = false }: { icon: React.ReactNode, label: string, active?: boolean, disabled?: boolean }) {
+function NavItem({ icon, label, active = false, disabled = false, onClick }: { icon: React.ReactNode, label: string, active?: boolean, disabled?: boolean, onClick?: () => void }) {
   return (
-    <div className={`
-      flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-all group
-      ${active ? 'bg-emerald-50 text-emerald-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'}
-      ${disabled ? 'opacity-40 cursor-not-allowed grayscale' : ''}
-    `}>
+    <div
+      onClick={!disabled ? onClick : undefined}
+      className={`
+        flex items-center justify-between px-4 py-3 rounded-xl transition-all group
+        ${active ? 'bg-emerald-50 text-emerald-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'}
+        ${disabled ? 'opacity-40 cursor-not-allowed grayscale' : 'cursor-pointer'}
+      `}
+    >
       <div className="flex items-center gap-3">
         {icon}
         <span className="text-sm font-medium">{label}</span>
