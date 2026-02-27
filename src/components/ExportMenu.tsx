@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, FileText, Sheet } from 'lucide-react';
+import { Download, FileText, FileSpreadsheet } from 'lucide-react';
 
 export default function ExportMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +33,7 @@ export default function ExportMenu() {
             onClick={() => setIsOpen(false)}
             className="flex items-center gap-3 px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
           >
-            <Sheet size={16} className="text-emerald-600" />
+            <FileSpreadsheet size={16} className="text-emerald-600" />
             Exportar CSV
           </a>
           <a
