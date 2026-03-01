@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Loader2, Bot } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -127,12 +128,26 @@ export default function ChatWidget() {
                 <>
                   {messages.map((msg, i) => (
                     <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[82%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                      <div className={`max-w-[82%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${
                         msg.role === 'user'
-                          ? 'bg-emerald-600 text-white rounded-br-sm'
-                          : 'bg-slate-100 text-slate-800 rounded-bl-sm'
+                          ? 'bg-emerald-600 text-white rounded-br-sm whitespace-pre-wrap'
+                          : 'bg-slate-100 text-slate-800 rounded-bl-sm prose prose-slate prose-sm max-w-none'
                       }`}>
-                        {msg.content}
+                        {msg.role === 'assistant' ? (
+                          <ReactMarkdown
+                            components={{
+                              p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                              ul: ({ children }) => <ul className="list-disc ml-4 mb-2">{children}</ul>,
+                              ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
+                              li: ({ children }) => <li className="mb-1">{children}</li>,
+                              strong: ({ children }) => <strong className="font-bold text-emerald-900">{children}</strong>,
+                            }}
+                          >
+                            {msg.content}
+                          </ReactMarkdown>
+                        ) : (
+                          msg.content
+                        )}
                       </div>
                     </div>
                   ))}
