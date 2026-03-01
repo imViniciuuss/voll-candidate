@@ -115,7 +115,6 @@ export default function App() {
           
           <nav className="space-y-1">
             <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" active={page === 'dashboard'} onClick={() => setPage('dashboard')} />
-            <NavItem icon={<Users size={20} />} label="Alunos" active={false} onClick={() => setPage('dashboard')} />
             <NavItem icon={<Calendar size={20} />} label="Agenda" active={page === 'agenda'} onClick={() => setPage('agenda')} />
             <NavItem icon={<TrendingUp size={20} />} label="Financeiro" active={page === 'financeiro'} onClick={() => setPage('financeiro')} />
           </nav>
